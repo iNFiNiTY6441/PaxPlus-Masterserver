@@ -1,0 +1,22 @@
+{
+  "name": "paxplus-masterserver",
+  "version": "1.0.0",
+  "description": "Masterserver for the Hawken PAX Client",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/iNFiNiTY6441/PaxPlus-Masterserver.git"
+  },
+  "author": "iNFiNiTY6441",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/iNFiNiTY6441/PaxPlus-Masterserver/issues"
+  },
+  "homepage": "https://github.com/iNFiNiTY6441/PaxPlus-Masterserver#readme",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
