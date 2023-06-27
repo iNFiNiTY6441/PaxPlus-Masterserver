@@ -2,15 +2,8 @@ const fs        = require("fs");
 const express   = require("express");
 const app       = express();
 
+// Local application config
 const g_Config = JSON.parse( fs.readFileSync( "./config.json","utf8" ) );
-
-// Contains all server listings
-var g_Servers = {};
-
-// Stats
-var g_Players = 0;
-var g_Capacity = 0;
-
 
 // Settings 
 var g_Settings = {
@@ -19,6 +12,13 @@ var g_Settings = {
     updateRate: process.env.updateRate || g_Config.updateRate || 1000,
     expireTime: process.env.expireTime || g_Config.expireTime || 5
 }
+
+// Contains all server listings
+var g_Servers = {};
+
+// Stats
+var g_Players = 0;
+var g_Capacity = 0;
 
 // The keys we expect listing json to have 
 var JSON_RequiredKeys = ["name","port","players","maxPlayers",]
@@ -96,7 +96,7 @@ app.get( '/serverListings', function( req, res ) {
  * They will bulk repost listings, should their connection to the masterserver be interrupted.
  */
 
-app.post( '/serverListings', function( req, res ) {
+app.put( '/serverListings', function( req, res ) {
 
     let messages = req.body;
 
@@ -115,7 +115,9 @@ app.post( '/serverListings', function( req, res ) {
         }
 
         // Very simple validation to see if we atleast have all of the keys.
-        for ( let key in JSON_RequiredKeys ) {
+        for ( let keyIndex=0; keyIndex > JSON_RequiredKeys.length; keyIndex++ ) {
+
+            let key = JSON_RequiredKeys[keyIndex];
 
             if ( !message.server[key] || message.server[key] == undefined ) {
 
