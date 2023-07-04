@@ -1,4 +1,5 @@
 const fs        = require("fs");
+const path      = require("path");
 const express   = require("express");
 const app       = express();
 
@@ -10,7 +11,7 @@ var g_Settings = {
 
     port: process.env.port || g_Config.port || 3000,
     updateRate: process.env.updateRate || g_Config.updateRate || 1000,
-    expireTime: process.env.expireTime || g_Config.expireTime || 5
+    expireTime: process.env.expireTime || g_Config.expireTime || 120
 }
 
 // Contains all server listings
@@ -18,13 +19,15 @@ var g_Servers = {};
 
 // Stats
 var g_Players = 0;
+var g_TotalSlots = 0;
 var g_Capacity = 0;
 
 // The keys we expect listing json to have 
 var JSON_RequiredKeys = ["name","port","players","maxPlayers",]
 
-
 // Middlewares
+app.set('view engine', 'ejs');
+app.use(express.static(path.join(__dirname, './www')));
 app.use(express.json());
 
 
@@ -35,8 +38,6 @@ app.use(express.json());
 function ShowStats(){
 
     console.clear();
-
-    let loadPercent = g_Players > 0 ? ( g_Players / g_Capacity ) * 100 : 0;
     
     // Edgy banner
     console.log( "    __________________________________________________________" );
@@ -46,8 +47,8 @@ function ShowStats(){
     |       |     | _/   \\_     |       |_____ |_____|  _____|
     `);
     console.log( "    __________________________________________ masterserver __\r\n\r\n" );
-    console.log( "    Reporting %s servers, %d total slots. \r\n\r\n", Object.keys( g_Servers ).length, g_Capacity);
-    console.log( "    PLAYERS: %s  [ %d % capacity ] \r\n\r\n", g_Players, loadPercent );
+    console.log( "    Reporting %s servers, %d total slots. \r\n\r\n", Object.keys( g_Servers ).length, g_TotalSlots);
+    console.log( "    PLAYERS: %s  [ %d % capacity ] \r\n\r\n", g_Players, g_Capacity );
     console.log( "\r\n" );
     console.log( "    . . . . . . . . . . . . . . . . . . . . . . Port: %s . .", g_Settings.port );
 }
@@ -69,16 +70,17 @@ function Tick(){
 
         if ( age > g_Settings.expireTime ) {
 
-            //delete g_Servers[server];
-            //continue;
+            delete g_Servers[server];
+            continue;
         }
 
-        totalSlots += g_Servers[server].maxPlayers;
-        players += g_Servers[server].players
+        totalSlots += parseInt( g_Servers[server].maxPlayers );
+        players += parseInt( g_Servers[server].players );
     }
 
     g_Players = players;
-    g_Capacity = totalSlots;
+    g_TotalSlots = totalSlots;
+    g_Capacity = g_Players > 0 ? ( g_Players / g_TotalSlots ) * 100 : 0;
 }
 
 /**
@@ -89,6 +91,35 @@ app.get( '/serverListings', function( req, res ) {
 
     res.send( JSON.stringify(g_Servers) );
 })
+
+/**
+ * Provide configuration settings to clients
+*/
+
+app.get( '/config', function( req, res ) {
+
+    res.send( JSON.stringify( {
+
+        ServiceMessage: "TEST ANNOUNCEMENT",
+        HeartbeatInterval: 300000,
+    
+    }));
+})
+
+/**
+ * Server a listing page as well
+ */
+app.get( '/', function( req, res ){
+
+    res.render('pages/serverlist', {
+        meta: {
+            players: g_Players,
+            capacity: g_Capacity
+        },
+
+        servers: g_Servers
+    });
+});
 
 /**
  * Update server listings according to the reporting client data.
@@ -124,6 +155,11 @@ app.put( '/serverListings', function( req, res ) {
                 res.status(400);
                 return res.send('Missing JSON data: '+ key );                
             }
+        }
+
+        // Sanitize
+        for ( let key in message.server ) {
+            message.server[key] = message.server[key].toString().replace(/[^-:a-zA-Z 0-9\n\r]+/g, '');
         }
 
         // Listings on the reporting client are mapped by their port only, but on the masterserver listings are mapped by IP:Port

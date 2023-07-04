@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="refresh" content="60" />
+    <title>PAX+ Servers</title>
+    <link rel="stylesheet" href="/style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Play&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&family=Play&display=swap" rel="stylesheet">
+  </head>
+
+
+  <body style="background-color: #121719;">
+    
+    <!-- BACKGROUND -->
+    <div class="center vertical-center" id="bg"></div>
+
+    <!-- SERVERLIST CONTAINER -->
+    <div class="center vertical-center">
+        
+        <!-- SERVERLIST PAGE ELEMENT -->
+        <div class="UIPage center" id="page_goptions" style="display: block; width: 800px;">
+
+        
+        <div class="pagewindow">
+
+            <div style="display: flex; width: 1000px;">
+                <h2 class="pageCategory edgeDots" style="width: 764px; height: 70px; margin-left: 1px; justify-content: left; padding-left: 30px;">
+                    PAX+ SERVERS
+                </h2>
+                
+            </div>  
+
+            <div style="width: 800px; height: 500px;">
+
+                <table id="serverlist" style="width: 796px; margin-left: 1px; margin-top: 2px;">
+
+                    <tr>
+                        <th style="width: 310px">Name</th>
+                        <th style="width: 140px;">Players</th>
+                        <th>IP</th>
+                        <th>Connect</th>
+                    </tr>
+
+                    <% for ( let serverKey in servers ) { %>
+                        <tr>
+                            <td><%= servers[serverKey].name %></td>
+                            <td><%= servers[serverKey].players %> / <%= servers[serverKey].maxPlayers %></td>
+                            <td style="font-size: 16px; opacity: 0.95;"><%= serverKey %></td>
+                
+                            <td style="width: 100px; font-size: 15.5px;">
+                            <button onclick='copyIP(this, "<%= serverKey %>" )'>COPY IP</button>
+                            </td>
+                        </tr>
+                    <% } %>
+                    
+                </table>
+
+            </div>
+
+            <!-- LINE SEPARATOR -->
+            <div class="pagewindow">
+                <h2 class="dailogWindow blockerLines separator">&nbsp;</h2>
+            </div>
+
+            <!-- GLOBAL STATS-->
+            <table id="globalStats">
+                <tr>
+                    <td class="edgeDots">PLAYERS: &nbsp;<span style="color: #3EC1A2;"> <%= meta.players %> </span></td>
+                    <td class="blockerLines"></td>
+                    <td class="edgeDots">SERVERS: &nbsp;<span style="color: #3EC1A2;"> <%= Object.keys( servers ).length %> </span></td>
+                    <td class="blockerLines"></td>
+                    <td class="edgeDots" ><%= meta.capacity %>% CAPACITY</td>
+                    <td class="blockerLines"></td>
+                    <td class="edgeDots"><button id="refreshButton" onclick="location.reload()">REFRESH</button></td>
+                </tr>
+            </table>
+            
+            <!-- LINE SEPARATOR -->
+            <div class="pagewindow">
+              <h2 class="dailogWindow blockerLines separator">&nbsp;</h2>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        function copyIP( btn, ip ) {
+
+            btn.innerHTML = "COPIED.";
+            btn.classList.add("triggered");
+            navigator.clipboard.writeText( ip );
+
+            setTimeout(() => {
+                btn.innerHTML = "COPY IP";
+                btn.classList.remove("triggered");
+            }, 1000);
+        }
+
+    </script>
+  </body>
+</html>
