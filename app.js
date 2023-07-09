@@ -11,7 +11,10 @@ var g_Settings = {
 
     port: process.env.port || g_Config.port || 3000,
     updateRate: process.env.updateRate || g_Config.updateRate || 1000,
-    expireTime: process.env.expireTime || g_Config.expireTime || 120
+    expireTime: process.env.expireTime || g_Config.expireTime || 120,
+
+    // Allows for the remapping of server listing IP addresses ( if gameservers and masterserver are in the same network )
+    addressRemappings: g_Config.addressMap || process.env.addressMap || {}
 }
 
 // Contains all server listings
@@ -162,8 +165,13 @@ app.put( '/serverListings', function( req, res ) {
             message.server[key] = message.server[key].toString().replace(/[^-:a-zA-Z 0-9\n\r]+/g, '');
         }
 
+        
+        let serverIP = req.ip;
+
+        if ( g_Settings.addressRemappings[ serverIP ] ) serverIP = g_Settings.addressRemappings[ serverIP ];
+
         // Listings on the reporting client are mapped by their port only, but on the masterserver listings are mapped by IP:Port
-        let serverKey = req.ip+":"+message.server.port;
+        let serverKey = serverIP+":"+message.server.port;
 
         // Don't need timeout or port information here anymore
         delete message.server.timeout;
