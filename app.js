@@ -191,25 +191,24 @@ app.put( '/serverListings', function( req, res ) {
             default: // If not an add / update / delete operation
                 res.status(400);
                 res.send('Unknown operation type.');
-                break;
+                return;
 
             case "add": // Add and update both overwrite existing entries, no harm done
             case "update":
                 message.server.added = new Date();
                 g_Servers[ serverKey ] = {};
                 g_Servers[ serverKey ] = message.server;
-                res.status(200);
-                res.send('Server added / Updated.');
                 break;
 
             case "delete": // Remove listing
                 delete g_Servers[ serverKey ];
-                res.status(200);
-                res.send('Server removed.');
                 break;
         }
         
     }
+
+    res.status(200);
+    res.send('Server data processed.');
 
 })
 
