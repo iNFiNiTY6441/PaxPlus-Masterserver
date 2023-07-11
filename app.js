@@ -83,7 +83,7 @@ function Tick(){
 
     g_Players = players;
     g_TotalSlots = totalSlots;
-    g_Capacity = g_Players > 0 ? ( g_Players / g_TotalSlots ) * 100 : 0;
+    g_Capacity = g_Players > 0 ? ( ( g_Players / g_TotalSlots ) * 100 ).toFixed(2) : 0;
 }
 
 /**
