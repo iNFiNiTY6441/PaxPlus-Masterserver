@@ -3,7 +3,7 @@
     "updateRate": 1000,
     "expireTime": 320,
 
-    "addressMap": {
+    "serverOverrides": {
 
         
     }
