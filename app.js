@@ -92,7 +92,14 @@ function Tick(){
 
 app.get( '/serverListings', function( req, res ) {
 
-    res.send( JSON.stringify(g_Servers) );
+    res.send( JSON.stringify({
+        meta: {
+            players: g_Players,
+            capacity: g_Capacity
+        },
+
+        servers: g_Servers
+    }) );
 })
 
 /**
